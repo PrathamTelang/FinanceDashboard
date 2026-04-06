@@ -1,38 +1,48 @@
 "use client"
-import SummaryCard from "@/components/SummaryCard"
-import BalanceChart from "@/components/BalanceChart"
-import CategoryChart from "@/components/CategoryChart"
-import TransactionsTable from "@/components/TransactionsTable"
-import RoleSwitcher from "@/components/RoleSwitcher"
-import { useFinance } from "@/context/FinanceContext"
+import { transcode } from 'buffer'
+import React, { useState } from 'react'
 
 export default function Page() {
-  const { transactions } = useFinance()
 
-  const income = transactions.filter(t => t.type === "income")
-    .reduce((a, t) => a + t.amount, 0)
+  type Transaction = {
+    amount: number
+    type: "income" | "expense"
+  }
 
-  const expense = transactions.filter(t => t.type === "expense")
-    .reduce((a, t) => a + t.amount, 0)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  const balance = income - expense
+  const summary = transactions.reduce((acc, t) => {
+    if (t.type === "income") {
+      acc.income += t.amount
+      acc.balance += t.amount
+    } else {
+      acc.expense += t.amount
+      acc.balance -= t.amount
+    }
+    return acc
+  }, { income: 0, expense: 0, balance: 0 })
 
   return (
-    <div className="p-6 space-y-6">
-      <RoleSwitcher />
-
-      <div className="grid grid-cols-3 gap-4">
-        <SummaryCard title="Balance" value={balance} />
-        <SummaryCard title="Income" value={income} />
-        <SummaryCard title="Expenses" value={expense} />
+    <div>
+      <h1>Finance Dashboard</h1>
+      <p className='bg-blue-500 text-black w-fit p-2'>Balance: {summary.balance}</p>
+      <div className='bg-green-500 text-black w-fit p-2'>Total Income: {summary.income}</div> 
+      <div className='bg-red-500 text-black w-fit p-2'>Total Expense: {summary.expense}</div> 
+      <button 
+      className='bg-white rounded-lg text-black p-2 cursor-pointer'
+      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "income" }])}>Add Income (+100)</button>
+      <button 
+      className='bg-white rounded-lg text-black p-2 cursor-pointer'
+      onClick={() => setTransactions(prev => [...prev, { amount: 50, type: "expense" }])}>Add Expense (-50)</button>
+      <div>
+        {
+          transactions.map((t, index) => (
+            <p key={index}>
+              {t.type}: {t.amount}
+            </p>
+        ))
+        }
       </div>
-
-      <div className="flex gap-6">
-        <BalanceChart />
-        <CategoryChart />
-      </div>
-
-      <TransactionsTable />
     </div>
   )
 }
