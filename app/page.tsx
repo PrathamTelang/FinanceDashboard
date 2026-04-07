@@ -6,6 +6,7 @@ export default function Page() {
   type Transaction = {
     amount: number
     type: "income" | "expense"
+    category: string
   }
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -29,15 +30,15 @@ export default function Page() {
       <div className='bg-red-500 text-black w-fit p-2'>Total Expense: {summary.expense}</div> 
       <button 
       className='bg-white rounded-lg text-black p-2 cursor-pointer'
-      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "income" }])}>Add Income (+100)</button>
+      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "income", category: "Salary" }])}>Add Income (+100)</button>
       <button 
       className='bg-white rounded-lg text-black p-2 cursor-pointer'
-      onClick={() => setTransactions(prev => [...prev, { amount: 50, type: "expense" }])}>Add Expense (-50)</button>
-      <div>
+      onClick={() => setTransactions(prev => [...prev, { amount: 50, type: "expense", category: "Food" }])}>Add Expense (-50)</button>
+      <div className="space-y-2 mt-4">
         {
           transactions.map((t, index) => (
             <p key={index}>
-              {t.type}: {t.amount}
+              {t.type} - {t.category}: {t.amount} 
             </p>
         ))
         }
