@@ -52,6 +52,13 @@ const incomeExpenseChartData = [
   { name: "Expense", value: summary.expense }
 ]
 
+  const [filter, setFilter] = useState<"all" | "income" | "expense">("all")
+
+  const filteredTransactions = transactions.filter((t) => {
+  if (filter === "all") return true
+  return t.type === filter
+})
+
 
   return (
     <div className="p-6 space-y-6">
@@ -122,13 +129,43 @@ const incomeExpenseChartData = [
     </PieChart>
 </div>
 </div>
+
+<div className="flex gap-2">
+  <button
+   className={`px-3 py-1 rounded ${
+  filter === "all" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+}`}
+    onClick={() => setFilter("all")}
+  >
+    All
+  </button>
+
+  <button
+    className={`px-3 py-1 rounded ${
+  filter === "income" ? "bg-green-500 text-white" : "bg-gray-200 text-black"
+}`}
+    onClick={() => setFilter("income")}
+  >
+    Income
+  </button>
+
+  <button
+    className={`px-3 py-1 rounded ${
+  filter === "expense" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
+}`}
+    onClick={() => setFilter("expense")}
+  >
+    Expense
+  </button>
+</div>
+
       <div className="bg-white text-black p-4 rounded-xl shadow mt-4">
   <h2 className="font-semibold mb-2">Transactions</h2>
 
   {transactions.length === 0 ? (
     <p className="text-gray-500">No transactions yet</p>
   ) : (
-    transactions.map((t, index) => (
+    filteredTransactions.map((t, index) => (
       <p key={index}>
         {t.type} - {t.category}: ₹{t.amount}
       </p>
