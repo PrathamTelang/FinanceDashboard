@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { PieChart, Pie, Tooltip } from "recharts"
+import { LineChart, Line, XAxis, YAxis } from "recharts"
 
 export default function Page() {
 
@@ -8,6 +9,7 @@ export default function Page() {
     amount: number
     type: "income" | "expense"
     category: string
+    date: string
   }
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -59,6 +61,21 @@ const incomeExpenseChartData = [
   return t.type === filter
 })
 
+let runningBalance = 0
+
+const lineChartData = transactions.map((t) => {
+  if (t.type === "income") {
+    runningBalance += t.amount
+  } else {
+    runningBalance -= t.amount
+  }
+
+  return {
+    date: t.date,
+    balance: runningBalance
+  }
+})
+
 
   return (
     <div className="p-6 space-y-6">
@@ -84,13 +101,13 @@ const incomeExpenseChartData = [
       <div className='flex gap-4'>
         <button 
       className='bg-green-500 hover:bg-green-600 text-white rounded-lg  p-2 cursor-pointer'
-      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "income", category: "Salary" }])}>Add Income (+100)</button>
+      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "income", category: "Salary", date: new Date().toLocaleDateString()}])}>Add Income (+100)</button>
       <button 
       className='bg-red-500 hover:bg-red-600 text-white rounded-lg p-2 cursor-pointer'
-      onClick={() => setTransactions(prev => [...prev, { amount: 50, type: "expense", category: "Food" }])}>Add Food Expense (-50)</button>
+      onClick={() => setTransactions(prev => [...prev, { amount: 50, type: "expense", category: "Food", date: new Date().toLocaleDateString() }])}>Add Food Expense (-50)</button>
       <button 
       className='bg-red-500 hover:bg-red-600 text-white rounded-lg p-2 cursor-pointer'
-      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "expense", category: "Shopping" }])}>Add Shopping Expense (-100)</button>
+      onClick={() => setTransactions(prev => [...prev, { amount: 100, type: "expense", category: "Shopping", date: new Date().toLocaleDateString() }])}>Add Shopping Expense (-100)</button>
       </div>
       <p className="bg-yellow-300 text-black w-fit p-2">
   Top Spending: {topCategory[0]} ({topCategory[1]})
@@ -127,6 +144,20 @@ const incomeExpenseChartData = [
       />
         <Tooltip />
     </PieChart>
+</div>
+<div className="bg-white p-4 rounded-xl shadow mt-6">
+  <h2 className="font-semibold mb-4 text-black">Balance Trend</h2>
+
+  {lineChartData.length === 0 ? (
+    <p className="text-gray-500">No data</p>
+  ) : (
+    <LineChart width={500} height={250} data={lineChartData}>
+      <XAxis dataKey="date" />
+      <YAxis />
+      <Tooltip />
+      <Line type="monotone" dataKey="balance" stroke="#8884d8" />
+    </LineChart>
+  )}
 </div>
 </div>
 
