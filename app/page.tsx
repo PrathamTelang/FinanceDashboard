@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react'
+import { PieChart, Pie, Tooltip } from "recharts"
 
 export default function Page() {
 
@@ -41,7 +42,10 @@ const topCategory = entries.reduce((max, curr) => {
   return max
 }, ["", 0])
 
-console.log(categoryTotals)
+const chartData = Object.entries(categoryTotals).map(([key, value]) => ({
+  name: key,
+  value: value
+}))
 
   return (
     <div className="p-6 space-y-6">
@@ -78,6 +82,23 @@ console.log(categoryTotals)
       <p className="bg-yellow-300 text-black w-fit p-2">
   Top Spending: {topCategory[0]} ({topCategory[1]})
 </p>
+
+<div className="bg-white p-4 rounded-xl shadow mt-6">
+  <h2 className="font-semibold mb-4 text-black">Spending Breakdown</h2>
+
+  <PieChart width={300} height={250} className='bg-gray-200'>
+    <Pie
+      data={chartData}
+      dataKey="value"
+      nameKey="name"
+      cx="50%"
+      cy="50%"
+      outerRadius={80}
+      fill="#8884d8"
+    />
+    <Tooltip />
+  </PieChart>
+</div>
       <div className="bg-white text-black p-4 rounded-xl shadow mt-4">
   <h2 className="font-semibold mb-2">Transactions</h2>
 
